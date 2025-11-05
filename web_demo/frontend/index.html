@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Vector Search Cookbook — Demo</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">
+        <div class="logo-dot"></div>
+        <div class="brand-text">
+          <h1>Vector Search Cookbook — Demo</h1>
+          <div class="sub">Hybrid • Index Variants • Benchmarks • Reranker</div>
+        </div>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-panel="panel-search">Search</button>
+        <button class="tab" data-panel="panel-answer">Answer</button>
+        <button class="tab" data-panel="panel-dataset">Dataset</button>
+        <button class="tab" data-panel="panel-admin">Admin</button>
+      </nav>
+    </header>
+
+    <main class="container">
+      <section id="panel-search" class="panel active">
+        <div class="toolbar grid-3">
+          <div class="group">
+            <label>Query</label>
+            <div class="row">
+              <input id="q" class="input" placeholder="Type your query…" />
+              <select id="view" class="select">
+                <option value="json">json</option>
+                <option value="cards">cards</option>
+              </select>
+              <button id="btn" class="btn primary">Search</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Vector Index</label>
+            <div class="row">
+              <select id="sel-index" class="select"></select>
+              <button id="rebtn" class="btn">Reindex</button>
+            </div>
+            <div class="row condensed">
+              <div class="field">
+                <span class="hint">nlist</span>
+                <input
+                  id="nlist"
+                  type="number"
+                  class="input sm"
+                  value="32"
+                  min="1"
+                />
+              </div>
+              <div class="field">
+                <span class="hint">nprobe</span>
+                <input
+                  id="nprobe"
+                  type="number"
+                  class="input sm"
+                  value="4"
+                  min="1"
+                />
+              </div>
+              <div class="field">
+                <span class="hint">graph M</span>
+                <input
+                  id="graphM"
+                  type="number"
+                  class="input sm"
+                  value="10"
+                  min="4"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Hybrid & Bench</label>
+            <div class="row">
+              <button id="hybtn" class="btn">Hybrid</button>
+              <div class="field">
+                <span class="hint">α</span>
+                <input
+                  id="alpha"
+                  type="number"
+                  step="0.05"
+                  class="input sm"
+                  value="0.5"
+                />
+              </div>
+              <button id="benchbtn" class="btn">Benchmark</button>
+              <button id="rerankbtn" class="btn">Rerank</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Dataset</label>
+            <div class="row">
+              <select id="sel-ds" class="select"></select>
+              <button id="switchbtn" class="btn">Switch Dataset</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Indexes</label>
+            <div class="row">
+              <button id="listix" class="btn">List</button>
+              <button id="saveix" class="btn">Save</button>
+              <button id="loadix" class="btn">Load</button>
+              <button id="expbtn" class="btn">Export .md</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="out" class="output"></div>
+      </section>
+
+      <section id="panel-answer" class="panel">
+        <div class="toolbar grid-2">
+          <div class="group">
+            <label>Ask</label>
+            <div class="row">
+              <input
+                id="q-answer"
+                class="input"
+                placeholder="Ask a question…"
+              />
+              <button id="answer-btn" class="btn primary">Answer</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Mode</label>
+            <div class="row condensed">
+              <select id="ans-mode" class="select">
+                <option value="rerank">rerank</option>
+                <option value="hybrid">hybrid</option>
+                <option value="bm25">bm25</option>
+                <option value="vector">vector</option>
+              </select>
+              <div class="field">
+                <span class="hint">α</span>
+                <input
+                  id="ans-alpha"
+                  type="number"
+                  step="0.05"
+                  class="input sm"
+                  value="0.3"
+                />
+              </div>
+              <div class="field">
+                <span class="hint">pool</span>
+                <input
+                  id="ans-pool"
+                  type="number"
+                  class="input sm"
+                  value="25"
+                  min="5"
+                />
+              </div>
+              <div class="field">
+                <span class="hint">sent_k</span>
+                <input
+                  id="sent-k"
+                  type="number"
+                  class="input sm"
+                  value="3"
+                  min="1"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="out-answer" class="output"></div>
+      </section>
+
+      <section id="panel-dataset" class="panel">
+        <div class="toolbar grid-2">
+          <div class="group">
+            <label>Upload</label>
+            <div class="row">
+              <input id="file" type="file" class="file" />
+              <button id="uploadbtn" class="btn">Inspect</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Map Columns</label>
+            <div class="row wrap">
+              <div class="field">
+                <span class="hint">id</span>
+                <select id="id-select" class="select"></select>
+              </div>
+              <div class="field">
+                <span class="hint">text</span>
+                <select id="text-select" class="select"></select>
+              </div>
+              <div class="field">
+                <span class="hint">dataset</span>
+                <input id="ds-name" class="input sm" value="uploaded" />
+              </div>
+              <label class="check">
+                <input id="lower-cb" type="checkbox" checked />
+                <span>lowercase</span>
+              </label>
+              <label class="check">
+                <input id="dedup-cb" type="checkbox" checked />
+                <span>deduplicate</span>
+              </label>
+              <button id="previewbtn" class="btn">Preview</button>
+              <button id="importbtn" class="btn primary">Import</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="out-dataset" class="output"></div>
+      </section>
+
+      <section id="panel-admin" class="panel">
+        <div class="toolbar grid-2">
+          <div class="group">
+            <label>Auth</label>
+            <div class="row">
+              <input
+                id="apikey"
+                type="password"
+                class="input"
+                placeholder="API key"
+              />
+              <button id="setkey" class="btn">Set Key</button>
+            </div>
+          </div>
+
+          <div class="group">
+            <label>Embedder</label>
+            <div class="row wrap">
+              <select id="emb-sel" class="select">
+                ...
+              </select>
+              <label class="check">
+                <input id="reemb-toggle" type="checkbox" />
+                <span>Re-embed on switch</span>
+              </label>
+              <button id="set-emb" class="btn">Set Embedder</button>
+              <button id="reemb-now" class="btn">Re-embed now</button>
+              <button id="cache-info" class="btn">Cache Info</button>
+              <button id="cache-clear" class="btn">Cache Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="out-admin" class="output"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">© Vector Search Cookbook</footer>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
