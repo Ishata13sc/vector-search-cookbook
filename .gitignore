@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 *.pyo
 
-# data/artifacts
+# data/artifacts (jangan naik ke repo)
 data/uploads/
 data/indexes/
 data/datasets/uploaded/
